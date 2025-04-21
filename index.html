@@ -2,35 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Lastic by Nika v3</title>
+  <title>Gratte by Nika</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      background: transparent;
+      margin: 0; padding: 0;
       overflow: hidden;
+      background: transparent;
     }
-
-    #eraser-label {
+    #label {
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(255, 105, 180, 0.9);
+      background: rgba(255, 0, 128, 0.85);
       color: white;
       font-family: sans-serif;
       font-size: 14px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
-      z-index: 1000;
+      z-index: 9999;
       transition: opacity 1s ease;
     }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
     .sparkle {
       position: absolute;
       width: 4px;
@@ -39,7 +30,6 @@
       pointer-events: none;
       animation: sparkle 0.6s forwards;
     }
-
     @keyframes sparkle {
       0% { transform: scale(1); opacity: 1; }
       100% { transform: scale(1.4); opacity: 0; }
@@ -47,84 +37,9 @@
   </style>
 </head>
 <body>
-  <div id="eraser-label">🧽 Волшебный Ластик</div>
-  <canvas id="mask"></canvas>
-  <audio id="eraseSound" src="erase-sound.mp3" preload="auto" loop></audio>
-
-  <script>
-    const canvas = document.getElementById("mask");
-    const ctx = canvas.getContext("2d");
-    const label = document.getElementById("eraser-label");
-    const sound = document.getElementById("eraseSound");
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      ctx.fillStyle = "rgba(150, 150, 150, 0.6)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const brushSize = parseInt(urlParams.get("size")) || 30;
-    let isErasing = false;
-
-    function sparkle(x, y) {
-      for (let i = 0; i < 5; i++) {
-        const s = document.createElement("div");
-        s.className = "sparkle";
-        const color = ["#fff", "#ccf6ff", "#ffddee", "#ffccff"][Math.floor(Math.random() * 4)];
-        s.style.background = color;
-        s.style.left = (x + (Math.random() * 10 - 5)) + "px";
-        s.style.top = (y + (Math.random() * 10 - 5)) + "px";
-        document.body.appendChild(s);
-        setTimeout(() => s.remove(), 600);
-      }
-    }
-
-    function erase(x, y) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, brushSize, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.clearRect(x - brushSize, y - brushSize, brushSize * 2, brushSize * 2);
-      ctx.restore();
-      sparkle(x, y);
-    }
-
-    canvas.addEventListener("mousedown", () => {
-      isErasing = true;
-      sound.currentTime = 0;
-      sound.play();
-    });
-
-    canvas.addEventListener("mouseup", () => {
-      isErasing = false;
-      sound.pause();
-    });
-
-    canvas.addEventListener("mouseleave", () => {
-      isErasing = false;
-      sound.pause();
-    });
-
-    canvas.addEventListener("mousemove", (e) => {
-      if (!isErasing) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      erase(x, y);
-    });
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        if (window.top !== window.self) {
-          label.style.opacity = 0;
-        }
-      }, 2000);
-    });
-  </script>
+  <div id="label">🧽 Волшебный Ластик</div>
+  <canvas id="canvas" style="position:absolute;top:0;left:0;"></canvas>
+  <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
+  <script src="main.js"></script>
 </body>
 </html>
