@@ -1,0 +1,11 @@
+{
+  "name": "dusty-eraser",
+  "title": "🧽 Dusty Eraser with Sound",
+  "description": "Ластик с пыльным эффектом и звуком при стирании. В редакторе — цветной блок.",
+  "author": "Nika Shum",
+  "icon": "🧽",
+  "tags": ["eraser", "dust", "sound", "interactive"],
+  "version": "1.1.0",
+  "entry": "index.html",
+  "type": "element"
+}
