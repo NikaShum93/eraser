@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dusty Eraser</title>
+  <title>Cover Eraser</title>
   <style>
     html, body {
       margin: 0;
@@ -14,40 +14,49 @@
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 10;
+      z-index: 2;
     }
-    img {
+    img.cover {
       width: 100%;
       height: 100%;
       object-fit: cover;
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 0;
+      z-index: 1;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <img id="image" src="">
   <canvas id="canvas"></canvas>
   <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
-
   <script>
+    const params = new URLSearchParams(window.location.search);
+    const coverURL = params.get("cover");
+
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-    const image = document.getElementById("image");
     const sound = document.getElementById("sound");
-
-    const params = new URLSearchParams(window.location.search);
-    const imgURL = params.get("img");
-    image.src = imgURL || "https://upload.wikimedia.org/wikipedia/commons/0/05/CRT_colorbars.svg";
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Закрашиваем canvas тёмным цветом, который будем стирать
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (coverURL) {
+      const img = new Image();
+      img.src = coverURL;
+      img.className = "cover";
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      document.body.appendChild(img);
+    } else {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
     let isErasing = false;
     let brushSize = 40;
@@ -101,19 +110,5 @@
       sparkle(x, y);
     });
   </script>
-
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: transparent;
-    }
-
-    @keyframes sparkle {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.4); opacity: 0; }
-    }
-  </style>
 </body>
 </html>
