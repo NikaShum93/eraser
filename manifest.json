@@ -1,0 +1,11 @@
+{
+  "name": "cover-eraser",
+  "title": "🧽 Cover Eraser by Nika",
+  "description": "Стираемый слой может быть цветом или изображением (?cover=...).",
+  "author": "Nika Shum",
+  "icon": "🧽",
+  "tags": ["eraser", "image", "cover", "magic"],
+  "version": "1.0.0",
+  "entry": "index.html",
+  "type": "element"
+}
