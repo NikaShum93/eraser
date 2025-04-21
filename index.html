@@ -28,44 +28,92 @@
   </style>
 </head>
 <body>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const isEditMode = params.get("edit") === "1";
-    const imgURL = params.get("img");
+  <img id="image" src="">
+  <canvas id="canvas"></canvas>
+  <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
 
-    if (isEditMode) {
-      document.write(`
-        <div style="
-          width: 100%;
-          height: 100%;
-          background: rgba(255, 204, 255, 0.2);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          font-family: sans-serif;
-          font-size: 13px;
-          color: #444;
-          text-align: center;
-          padding: 8px;
-        ">
-          <div><strong>🧽 Sparkle Eraser</strong></div>
-          <div style="margin-top: 2px;">by Nika Shum</div>
-          <div style="margin-top: 6px;">
-            <a href="https://t.me/kgbgamelab" target="_blank" style="color: #666; text-decoration: none; font-size: 12px;">
-              Корпорация Геймификации Будущего
-            </a>
-          </div>
-        </div>
-      `);
-    } else {
-      document.write(`
-        <img id="image" src="${imgURL || 'https://upload.wikimedia.org/wikipedia/commons/0/05/CRT_colorbars.svg'}">
-        <canvas id="canvas"></canvas>
-        <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
-        <script src="plugin.js"><\\/script>
-      `);
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const image = document.getElementById("image");
+    const sound = document.getElementById("sound");
+
+    const params = new URLSearchParams(window.location.search);
+    const imgURL = params.get("img");
+    image.src = imgURL || "https://upload.wikimedia.org/wikipedia/commons/0/05/CRT_colorbars.svg";
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Закрашиваем canvas тёмным цветом, который будем стирать
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let isErasing = false;
+    let brushSize = 40;
+
+    function sparkle(x, y) {
+      for (let i = 0; i < 6; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        const color = ["#fff", "#ccf6ff", "#ffddee", "#ffccff"][Math.floor(Math.random() * 4)];
+        s.style.background = color;
+        s.style.left = (x + (Math.random() * 10 - 5)) + "px";
+        s.style.top = (y + (Math.random() * 10 - 5)) + "px";
+        s.style.position = "absolute";
+        s.style.width = "4px";
+        s.style.height = "4px";
+        s.style.borderRadius = "50%";
+        s.style.pointerEvents = "none";
+        s.style.zIndex = "9999";
+        s.style.animation = "sparkle 0.6s forwards";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 600);
+      }
     }
+
+    canvas.addEventListener("mousedown", () => {
+      isErasing = true;
+      sound.currentTime = 0;
+      sound.play();
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      isErasing = false;
+      sound.pause();
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      isErasing = false;
+      sound.pause();
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!isErasing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
+      sparkle(x, y);
+    });
   </script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    @keyframes sparkle {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+  </style>
 </body>
 </html>
