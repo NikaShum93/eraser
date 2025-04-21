@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cover Eraser</title>
+  <title>Magic Eraser</title>
   <style>
     html, body {
       margin: 0;
@@ -14,16 +14,19 @@
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 2;
+      z-index: 10;
     }
-    img.cover {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    #brush-picker {
       position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
+      top: 10px;
+      right: 10px;
+      z-index: 10000;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-family: 'Comic Sans MS', sans-serif;
+      font-size: 14px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
     @keyframes sparkle {
       0% { transform: scale(1); opacity: 1; }
@@ -34,32 +37,35 @@
 <body>
   <canvas id="canvas"></canvas>
   <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const coverURL = params.get("cover");
 
+  <div id="brush-picker">
+    🧽 Кисть:
+    <select id="brush-select">
+      <option value="20">20</option>
+      <option value="40" selected>40</option>
+      <option value="60">60</option>
+      <option value="80">80</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+
+  <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const sound = document.getElementById("sound");
+    const brushSelect = document.getElementById("brush-select");
+    const params = new URLSearchParams(window.location.search);
+
+    const coverURL = params.get("cover");
+    let brushSize = parseInt(params.get("brush")) || 40;
+    brushSelect.value = brushSize.toString();
+
+    brushSelect.addEventListener("change", () => {
+      brushSize = parseInt(brushSelect.value);
+    });
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    if (coverURL) {
-      const img = new Image();
-      img.src = coverURL;
-      img.className = "cover";
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      };
-      document.body.appendChild(img);
-    } else {
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    let isErasing = false;
-    let brushSize = 40;
 
     function sparkle(x, y) {
       for (let i = 0; i < 6; i++) {
@@ -81,34 +87,57 @@
       }
     }
 
-    canvas.addEventListener("mousedown", () => {
-      isErasing = true;
-      sound.currentTime = 0;
-      sound.play();
-    });
+    function enableEraser() {
+      let isErasing = false;
 
-    canvas.addEventListener("mouseup", () => {
-      isErasing = false;
-      sound.pause();
-    });
+      canvas.addEventListener("mousedown", () => {
+        isErasing = true;
+        sound.currentTime = 0;
+        sound.play();
+      });
 
-    canvas.addEventListener("mouseleave", () => {
-      isErasing = false;
-      sound.pause();
-    });
+      canvas.addEventListener("mouseup", () => {
+        isErasing = false;
+        sound.pause();
+      });
 
-    canvas.addEventListener("mousemove", (e) => {
-      if (!isErasing) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.beginPath();
-      ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalCompositeOperation = "source-over";
-      sparkle(x, y);
-    });
+      canvas.addEventListener("mouseleave", () => {
+        isErasing = false;
+        sound.pause();
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (!isErasing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = "source-over";
+        sparkle(x, y);
+      });
+    }
+
+    if (coverURL) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        enableEraser();
+      };
+      img.onerror = () => {
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        enableEraser();
+      };
+      img.src = coverURL;
+    } else {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      enableEraser();
+    }
   </script>
 </body>
 </html>
