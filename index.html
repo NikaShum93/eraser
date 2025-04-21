@@ -28,9 +28,43 @@
   </style>
 </head>
 <body>
-  <img id="image" src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Mona_Lisa.jpg">
-  <canvas id="canvas"></canvas>
-  <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
-  <script src="plugin.js"></script>
+  <script>
+    if (window.top !== window.self) {
+      // Режим редактора: показываем заглушку с названием и брендом
+      document.write(`
+        <div style="
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(45deg, #ffccff, #ffccff 10px, #fff 10px, #fff 20px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Comic Sans MS', sans-serif;
+          font-size: 16px;
+          color: #333;
+          text-align: center;
+          padding: 10px;
+        ">
+          <div style="font-size: 24px;">🧽 <strong>Sparkle Eraser</strong></div>
+          <div style="font-size: 14px; margin-top: 4px;">by Nika Shum</div>
+          <div style="margin-top: 10px; font-size: 13px;">
+            <a href="https://t.me/kgbgamelab" target="_blank" style="color: #000; text-decoration: none;">
+              🧪 Корпорация Геймификации Будущего
+            </a>
+          </div>
+        </div>
+      `);
+    } else {
+      // Демонстрация: плагин активен
+      document.write(`
+        <img id="image" src="">
+        <canvas id="canvas"></canvas>
+        <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
+        <script src="plugin.js"><\\/script>
+      `);
+    }
+  </script>
 </body>
+
 </html>
