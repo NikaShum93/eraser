@@ -1,45 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Gratte by Nika</title>
+  <meta charset="UTF-8">
+  <title>Dusty Eraser</title>
   <style>
     html, body {
-      margin: 0; padding: 0;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
       background: transparent;
     }
-    #label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(255, 0, 128, 0.85);
-      color: white;
+    .placeholder {
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(45deg, #ffccff, #ffccff 10px, #fff 10px, #fff 20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-family: sans-serif;
       font-size: 14px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      z-index: 9999;
-      transition: opacity 1s ease;
+      color: #333;
     }
-    .sparkle {
+    canvas {
       position: absolute;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: sparkle 0.6s forwards;
-    }
-    @keyframes sparkle {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.4); opacity: 0; }
+      top: 0;
+      left: 0;
     }
   </style>
 </head>
 <body>
-  <div id="label">🧽 Волшебный Ластик</div>
-  <canvas id="canvas" style="position:absolute;top:0;left:0;"></canvas>
-  <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
-  <script src="main.js"></script>
+  <script>
+    if (window.top !== window.self) {
+      document.body.innerHTML = '<div class="placeholder">🧽 Ластик Nika<br>Сгруппируй с изображением</div>';
+    } else {
+      document.write('<img id="image" src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Mona_Lisa.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:0;">');
+      document.write('<canvas id="canvas"></canvas><audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio><script src="plugin.js"><\/script>');
+    }
+  </script>
 </body>
 </html>
