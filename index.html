@@ -30,33 +30,33 @@
 <body>
   <script>
     if (window.top !== window.self) {
-      // Режим редактора: показываем заглушку с названием и брендом
+      // Режим редактора: показываем лёгкую, полупрозрачную плашку
       document.write(`
         <div style="
           width: 100%;
           height: 100%;
-          background: repeating-linear-gradient(45deg, #ffccff, #ffccff 10px, #fff 10px, #fff 20px);
+          background: rgba(255, 204, 255, 0.2);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          font-family: 'Comic Sans MS', sans-serif;
-          font-size: 16px;
-          color: #333;
+          font-family: sans-serif;
+          font-size: 13px;
+          color: #444;
           text-align: center;
-          padding: 10px;
+          padding: 8px;
         ">
-          <div style="font-size: 24px;">🧽 <strong>Sparkle Eraser</strong></div>
-          <div style="font-size: 14px; margin-top: 4px;">by Nika Shum</div>
-          <div style="margin-top: 10px; font-size: 13px;">
-            <a href="https://t.me/kgbgamelab" target="_blank" style="color: #000; text-decoration: none;">
-              🧪 Корпорация Геймификации Будущего
+          <div><strong>🧽 Sparkle Eraser</strong></div>
+          <div style="margin-top: 2px;">by Nika Shum</div>
+          <div style="margin-top: 6px;">
+            <a href="https://t.me/kgbgamelab" target="_blank" style="color: #666; text-decoration: none; font-size: 12px;">
+              Корпорация Геймификации Будущего
             </a>
           </div>
         </div>
       `);
     } else {
-      // Демонстрация: плагин активен
+      // Демонстрация: только магия!
       document.write(`
         <img id="image" src="">
         <canvas id="canvas"></canvas>
@@ -66,5 +66,4 @@
     }
   </script>
 </body>
-
 </html>
