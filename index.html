@@ -38,31 +38,15 @@
   <canvas id="canvas"></canvas>
   <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
 
-  <div id="brush-picker">
-    🧽 Кисть:
-    <select id="brush-select">
-      <option value="20">20</option>
-      <option value="40" selected>40</option>
-      <option value="60">60</option>
-      <option value="80">80</option>
-      <option value="100">100</option>
-    </select>
-  </div>
-
   <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const sound = document.getElementById("sound");
-    const brushSelect = document.getElementById("brush-select");
     const params = new URLSearchParams(window.location.search);
 
     const coverURL = params.get("cover");
     let brushSize = parseInt(params.get("brush")) || 40;
-    brushSelect.value = brushSize.toString();
-
-    brushSelect.addEventListener("change", () => {
-      brushSize = parseInt(brushSelect.value);
-    });
+    const showUI = params.get("ui") === "1";
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -118,6 +102,27 @@
         ctx.globalCompositeOperation = "source-over";
         sparkle(x, y);
       });
+
+      if (showUI) {
+        const picker = document.createElement("div");
+        picker.id = "brush-picker";
+        picker.innerHTML = `
+          🧽 Кисть: 
+          <select id="brush-select">
+            <option value="20">20</option>
+            <option value="40">40</option>
+            <option value="60">60</option>
+            <option value="80">80</option>
+            <option value="100">100</option>
+          </select>
+        `;
+        document.body.appendChild(picker);
+        const brushSelect = document.getElementById("brush-select");
+        brushSelect.value = brushSize;
+        brushSelect.addEventListener("change", () => {
+          brushSize = parseInt(brushSelect.value);
+        });
+      }
     }
 
     if (coverURL) {
