@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transparent Magic Eraser</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scratch"></canvas>
+  <script>
+    const canvas = document.getElementById("scratch");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawOverlay();
+    }
+
+    function drawOverlay() {
+      const img = new Image();
+      img.src = 'https://images.unsplash.com/photo-1557682250-33bd709cbe85'; // можно заменить на свою
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
+
+    function erase(x, y) {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, 30, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
+    }
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (e.buttons !== 1) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      erase(x, y);
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+  </script>
+</body>
+</html>
