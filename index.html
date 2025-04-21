@@ -29,8 +29,11 @@
 </head>
 <body>
   <script>
-    if (window.top !== window.self) {
-      // Режим редактора: показываем лёгкую, полупрозрачную плашку
+    const params = new URLSearchParams(window.location.search);
+    const isEditMode = params.get("edit") === "1";
+    const imgURL = params.get("img");
+
+    if (isEditMode) {
       document.write(`
         <div style="
           width: 100%;
@@ -56,9 +59,8 @@
         </div>
       `);
     } else {
-      // Демонстрация: только магия!
       document.write(`
-        <img id="image" src="">
+        <img id="image" src="${imgURL || 'https://upload.wikimedia.org/wikipedia/commons/0/05/CRT_colorbars.svg'}">
         <canvas id="canvas"></canvas>
         <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
         <script src="plugin.js"><\\/script>
