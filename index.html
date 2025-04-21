@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Magic Glitter Eraser v2</title>
+  <title>Lastic by Nika v3</title>
   <style>
     html, body {
       margin: 0;
@@ -15,11 +15,11 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(255, 0, 128, 0.8);
+      background: rgba(255, 105, 180, 0.9);
       color: white;
       font-family: sans-serif;
-      font-size: 16px;
-      padding: 4px 10px;
+      font-size: 14px;
+      padding: 4px 8px;
       border-radius: 6px;
       z-index: 1000;
       transition: opacity 1s ease;
@@ -31,7 +31,7 @@
       left: 0;
     }
 
-    .particle {
+    .sparkle {
       position: absolute;
       width: 4px;
       height: 4px;
@@ -41,25 +41,21 @@
     }
 
     @keyframes sparkle {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1.5);
-        opacity: 0;
-      }
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
     }
   </style>
 </head>
 <body>
   <div id="eraser-label">🧽 Волшебный Ластик</div>
-  <canvas id="scratch"></canvas>
+  <canvas id="mask"></canvas>
+  <audio id="eraseSound" src="erase-sound.mp3" preload="auto" loop></audio>
 
   <script>
-    const canvas = document.getElementById("scratch");
+    const canvas = document.getElementById("mask");
     const ctx = canvas.getContext("2d");
     const label = document.getElementById("eraser-label");
+    const sound = document.getElementById("eraseSound");
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -68,33 +64,51 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    function erase(x, y) {
-      // стирание кругом
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, brushSize, 0, 2 * Math.PI);
-      ctx.clip();
-      ctx.clearRect(x - brushSize, y - brushSize, brushSize * 2, brushSize * 2);
-      ctx.restore();
+    const urlParams = new URLSearchParams(window.location.search);
+    const brushSize = parseInt(urlParams.get("size")) || 30;
+    let isErasing = false;
 
-      // волшебные маленькие блестки
-      for (let i = 0; i < 6; i++) {
-        const particle = document.createElement("div");
-        particle.className = "particle";
-        const color = ["#fff", "#ffddff", "#ccf6ff", "#ffddee"][Math.floor(Math.random() * 4)];
-        particle.style.background = color;
-        particle.style.left = (x + (Math.random() * 10 - 5)) + "px";
-        particle.style.top = (y + (Math.random() * 10 - 5)) + "px";
-        document.body.appendChild(particle);
-        setTimeout(() => particle.remove(), 600);
+    function sparkle(x, y) {
+      for (let i = 0; i < 5; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        const color = ["#fff", "#ccf6ff", "#ffddee", "#ffccff"][Math.floor(Math.random() * 4)];
+        s.style.background = color;
+        s.style.left = (x + (Math.random() * 10 - 5)) + "px";
+        s.style.top = (y + (Math.random() * 10 - 5)) + "px";
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 600);
       }
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const brushSize = parseInt(urlParams.get("size")) || 30;
+    function erase(x, y) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, brushSize, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.clearRect(x - brushSize, y - brushSize, brushSize * 2, brushSize * 2);
+      ctx.restore();
+      sparkle(x, y);
+    }
+
+    canvas.addEventListener("mousedown", () => {
+      isErasing = true;
+      sound.currentTime = 0;
+      sound.play();
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      isErasing = false;
+      sound.pause();
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      isErasing = false;
+      sound.pause();
+    });
 
     canvas.addEventListener("mousemove", (e) => {
-      if (e.buttons !== 1) return;
+      if (!isErasing) return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -104,7 +118,6 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Скрытие плашки при демонстрации
     window.addEventListener("load", () => {
       setTimeout(() => {
         if (window.top !== window.self) {
@@ -113,36 +126,5 @@
       }, 2000);
     });
   </script>
-
-<audio id="eraseSound" src="erase-sound.mp3" loop preload="auto"></audio>
-<script>
-  const sound = document.getElementById("eraseSound");
-  let isErasing = false;
-
-  canvas.addEventListener("mousedown", () => {
-    isErasing = true;
-    sound.currentTime = 0;
-    sound.play();
-  });
-
-  canvas.addEventListener("mouseup", () => {
-    isErasing = false;
-    sound.pause();
-  });
-
-  canvas.addEventListener("mouseleave", () => {
-    isErasing = false;
-    sound.pause();
-  });
-
-  canvas.addEventListener("mousemove", (e) => {
-    if (!isErasing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    erase(x, y);
-  });
-</script>
 </body>
-
 </html>
