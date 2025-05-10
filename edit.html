@@ -69,10 +69,6 @@
   <textarea id="iframeCode" rows="5" readonly></textarea>
 
   <script>
-    function generateID() {
-      return 'eraser-' + Math.floor(Math.random() * 100000);
-    }
-
     function updatePreview() {
       const imgUrl = document.getElementById('imgUrl').value;
       const preview = document.getElementById('imagePreview');
@@ -89,7 +85,7 @@
       preview.onload = () => {
         const width = preview.naturalWidth;
         const height = preview.naturalHeight;
-        const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}&ui=1`;
+        const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}`;
         const code = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
         iframeCode.value = code;
       }
