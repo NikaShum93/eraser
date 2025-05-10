@@ -41,7 +41,7 @@
 }
 
     window.addEventListener('resize', () => {
-      resizeCanvas();
+      
       if (imageLoaded) ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     });
 
@@ -101,7 +101,7 @@
     }
 
     let imageLoaded = false;
-    let image = new Image();
+let image = new Image();
 
     if (coverURL) {
       image.crossOrigin = "anonymous";
@@ -121,6 +121,27 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       enableEraser();
     }
-  </script>
+  window.addEventListener('load', () => {
+  resizeCanvas();
+  if (coverURL) {
+    image.crossOrigin = "anonymous";
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      imageLoaded = true;
+      enableEraser();
+    };
+    image.onerror = () => {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      enableEraser();
+    };
+    image.src = coverURL;
+  } else {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    enableEraser();
+  }
+});
+</script>
 </body>
 </html>
