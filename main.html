@@ -11,10 +11,9 @@
       background: transparent;
     }
     canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 10;
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
     }
     @keyframes sparkle {
       0% { transform: scale(1); opacity: 1; }
@@ -35,8 +34,17 @@
     const coverURL = params.get("cover");
     let brushSize = parseInt(params.get("brush")) || 40;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      if (imageLoaded) ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    });
+
+    resizeCanvas();
 
     function sparkle(x, y) {
       for (let i = 0; i < 6; i++) {
@@ -91,19 +99,22 @@
       });
     }
 
+    let imageLoaded = false;
+    let image = new Image();
+
     if (coverURL) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      image.crossOrigin = "anonymous";
+      image.onload = () => {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        imageLoaded = true;
         enableEraser();
       };
-      img.onerror = () => {
+      image.onerror = () => {
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         enableEraser();
       };
-      img.src = coverURL;
+      image.src = coverURL;
     } else {
       ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
