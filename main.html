@@ -35,9 +35,10 @@
     let brushSize = parseInt(params.get("brush")) || 40;
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+}
 
     window.addEventListener('resize', () => {
       resizeCanvas();
