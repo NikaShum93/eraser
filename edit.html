@@ -51,8 +51,27 @@
   <div class="logo">Корпорация Геймификации Будущего</div>
   <h1>Редактор "Волшебного Ластика"</h1>
 
-  <label for="imgUrl">Ссылка на изображение (cover):</label>
-  <input type="text" id="imgUrl" placeholder="https://..." oninput="updatePreview()">
+  <label for="sourceType">Источник маски:</label>
+  <select id="sourceType" onchange="updatePreview()">
+    <option value="image" selected>Изображение</option>
+    <option value="color">Цвет маски</option>
+  </select>
+
+  <div id="imageBlock">
+    <label for="imgUrl">Ссылка на изображение (cover):</label>
+    <input type="text" id="imgUrl" placeholder="https://..." oninput="updatePreview()">
+  </div>
+
+  <div id="colorBlock" style="display: none;">
+    <label for="maskColor">Выбери цвет маски:</label>
+    <select id="maskColor" onchange="updatePreview()">
+      <option value="#000000">Чёрный</option>
+      <option value="#ffffff">Белый</option>
+      <option value="#ff0000">Красный</option>
+      <option value="#0000ff">Синий</option>
+      <option value="#00ff00">Зелёный</option>
+    </select>
+  </div>
 
   <label for="brushSize">Размер кисти:</label>
   <select id="brushSize">
@@ -70,24 +89,36 @@
 
   <script>
     function updatePreview() {
+      const sourceType = document.getElementById('sourceType').value;
       const imgUrl = document.getElementById('imgUrl').value;
-      const preview = document.getElementById('imagePreview');
+      const maskColor = document.getElementById('maskColor').value;
       const brushSize = document.getElementById('brushSize').value;
+      const preview = document.getElementById('imagePreview');
       const iframeCode = document.getElementById('iframeCode');
 
-      if (imgUrl.trim() === '') {
+      if (sourceType === 'image') {
+        document.getElementById('imageBlock').style.display = 'block';
+        document.getElementById('colorBlock').style.display = 'none';
+        if (imgUrl.trim() === '') {
+          preview.src = '';
+          iframeCode.value = '';
+          return;
+        }
+        preview.src = imgUrl;
+        preview.onload = () => {
+          const width = preview.naturalWidth;
+          const height = preview.naturalHeight;
+          const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}`;
+          iframeCode.value = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
+        }
+      } else {
+        document.getElementById('imageBlock').style.display = 'none';
+        document.getElementById('colorBlock').style.display = 'block';
         preview.src = '';
-        iframeCode.value = '';
-        return;
-      }
-
-      preview.src = imgUrl;
-      preview.onload = () => {
-        const width = preview.naturalWidth;
-        const height = preview.naturalHeight;
-        const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}`;
-        const code = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
-        iframeCode.value = code;
+        const width = 800;
+        const height = 600;
+        const src = `https://nikashum93.github.io/eraser/main.html?mask=${encodeURIComponent(maskColor)}&brush=${brushSize}`;
+        iframeCode.value = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
       }
     }
   </script>
