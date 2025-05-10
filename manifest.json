@@ -4,6 +4,6 @@
   "version": "1.0.1",
   "type": "custom",
   "main": "main.html",
-  "editor": "index.html",
+  "editor": "edit.html",
   "icon": "https://nikashum93.github.io/pusyriki/assets/kgb-icon.png"
 }
