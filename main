@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Eraser</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: transparent;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="eraserCanvas"></canvas>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const imgUrl = params.get('img');
+    const size = params.get('size') || 'medium';
+
+    const brushSizes = {
+      small: 20,
+      medium: 40,
+      large: 80
+    };
+
+    const canvas = document.getElementById('eraserCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.src = imgUrl;
+
+    image.onload = () => {
+      canvas.width = image.width;
+      canvas.height = image.height;
+
+      // Draw image
+      ctx.drawImage(image, 0, 0);
+
+      // Overlay black layer
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'destination-out';
+    };
+
+    let isDrawing = false;
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      draw(e);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (isDrawing) draw(e);
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isDrawing = false;
+    });
+
+    function draw(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const radius = brushSizes[size] || 40;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  </script>
+</body>
+</html>
