@@ -106,9 +106,26 @@ let image = new Image();
     if (coverURL) {
       image.crossOrigin = "anonymous";
       image.onload = () => {
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        imageLoaded = true;
-        enableEraser();
+  imageLoaded = true;
+  resizeCanvas();
+
+  const canvasRatio = canvas.width / canvas.height;
+  const imageRatio = image.width / image.height;
+  let drawWidth, drawHeight;
+
+  if (canvasRatio > imageRatio) {
+    drawHeight = canvas.height;
+    drawWidth = image.width * (canvas.height / image.height);
+  } else {
+    drawWidth = canvas.width;
+    drawHeight = image.height * (canvas.width / image.width);
+  }
+
+  const offsetX = (canvas.width - drawWidth) / 2;
+  const offsetY = (canvas.height - drawHeight) / 2;
+
+  ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+  enableEraser();
       };
       image.onerror = () => {
         ctx.fillStyle = "#000";
