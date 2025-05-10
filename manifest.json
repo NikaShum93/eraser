@@ -1,11 +1,9 @@
 {
-  "name": "cover-eraser",
-  "title": "🧽 Cover Eraser by Nika",
-  "description": "Стираемый слой может быть цветом или изображением (?cover=...).",
-  "author": "Nika Shum",
-  "icon": "🧽",
-  "tags": ["eraser", "image", "cover", "magic"],
-  "version": "1.0.0",
-  "entry": "index.html",
-  "type": "element"
+  "name": "Волшебный Ластик",
+  "description": "Стирайте чёрный слой с эффектами блёсток и звуком, чтобы открыть изображение.",
+  "version": "1.0.1",
+  "type": "custom",
+  "main": "main.html",
+  "editor": "index.html",
+  "icon": "https://nikashum93.github.io/assets/kgb-icon.png"
 }
