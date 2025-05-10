@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Редактор Волшебного Ластика</title>
+  <style>
+    body {
+      background: black;
+      color: #0ff;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+    }
+    .logo {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #f0f;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 5px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      background: #111;
+      color: #0ff;
+      border: 1px solid #0ff;
+      font-size: 14px;
+    }
+    img.preview {
+      margin-top: 20px;
+      max-width: 100%;
+      border: 2px solid #0ff;
+    }
+    .iframe-output {
+      margin-top: 30px;
+      background: #111;
+      padding: 10px;
+      border: 1px dashed #0ff;
+      color: #0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">Корпорация Геймификации Будущего</div>
+  <h1>Редактор "Волшебного Ластика"</h1>
+
+  <label for="imgUrl">Ссылка на изображение:</label>
+  <input type="text" id="imgUrl" placeholder="https://..." oninput="updatePreview()">
+
+  <label for="brushSize">Размер кисти:</label>
+  <select id="brushSize">
+    <option value="small">Маленькая</option>
+    <option value="medium" selected>Средняя</option>
+    <option value="large">Большая</option>
+  </select>
+
+  <div id="imagePreviewContainer">
+    <img id="imagePreview" class="preview" src="" alt="Превью изображения">
+  </div>
+
+  <label for="iframeCode">Готовый iframe-код:</label>
+  <textarea id="iframeCode" rows="5" readonly></textarea>
+
+  <script>
+    function generateID() {
+      return 'eraser-' + Math.floor(Math.random() * 100000);
+    }
+
+    function updatePreview() {
+      const imgUrl = document.getElementById('imgUrl').value;
+      const preview = document.getElementById('imagePreview');
+      const brushSize = document.getElementById('brushSize').value;
+      const id = generateID();
+      const iframeCode = document.getElementById('iframeCode');
+
+      if (imgUrl.trim() === '') {
+        preview.src = '';
+        iframeCode.value = '';
+        return;
+      }
+
+      preview.src = imgUrl;
+      preview.onload = () => {
+        const width = preview.naturalWidth;
+        const height = preview.naturalHeight;
+        const src = `https://nikashum93.github.io/eraser/main.html?img=${encodeURIComponent(imgUrl)}&size=${brushSize}&id=${id}`;
+        const code = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
+        iframeCode.value = code;
+      }
+    }
+  </script>
+</body>
+</html>
