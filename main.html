@@ -16,18 +16,6 @@
       left: 0;
       z-index: 10;
     }
-    #brush-picker {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 10000;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-family: 'Comic Sans MS', sans-serif;
-      font-size: 14px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
     @keyframes sparkle {
       0% { transform: scale(1); opacity: 1; }
       100% { transform: scale(1.4); opacity: 0; }
@@ -36,17 +24,16 @@
 </head>
 <body>
   <canvas id="canvas"></canvas>
-  <audio id="sound" src="erase-sound.mp3" preload="auto" loop></audio>
+  <audio src="erase-sound.mp3" preload="auto" loop></audio>
 
   <script>
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
-    const sound = document.getElementById("sound");
+    const sound = document.querySelector("audio");
     const params = new URLSearchParams(window.location.search);
 
     const coverURL = params.get("cover");
     let brushSize = parseInt(params.get("brush")) || 40;
-    const showUI = params.get("ui") === "1";
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -102,27 +89,6 @@
         ctx.globalCompositeOperation = "source-over";
         sparkle(x, y);
       });
-
-      if (showUI) {
-        const picker = document.createElement("div");
-        picker.id = "brush-picker";
-        picker.innerHTML = `
-          🧽 Кисть: 
-          <select id="brush-select">
-            <option value="20">20</option>
-            <option value="40">40</option>
-            <option value="60">60</option>
-            <option value="80">80</option>
-            <option value="100">100</option>
-          </select>
-        `;
-        document.body.appendChild(picker);
-        const brushSelect = document.getElementById("brush-select");
-        brushSelect.value = brushSize;
-        brushSelect.addEventListener("change", () => {
-          brushSize = parseInt(brushSelect.value);
-        });
-      }
     }
 
     if (coverURL) {
