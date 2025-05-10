@@ -51,14 +51,14 @@
   <div class="logo">Корпорация Геймификации Будущего</div>
   <h1>Редактор "Волшебного Ластика"</h1>
 
-  <label for="imgUrl">Ссылка на изображение:</label>
+  <label for="imgUrl">Ссылка на изображение (cover):</label>
   <input type="text" id="imgUrl" placeholder="https://..." oninput="updatePreview()">
 
   <label for="brushSize">Размер кисти:</label>
   <select id="brushSize">
-    <option value="small">Маленькая</option>
-    <option value="medium" selected>Средняя</option>
-    <option value="large">Большая</option>
+    <option value="20">Маленькая</option>
+    <option value="40" selected>Средняя</option>
+    <option value="80">Большая</option>
   </select>
 
   <div id="imagePreviewContainer">
@@ -77,7 +77,6 @@
       const imgUrl = document.getElementById('imgUrl').value;
       const preview = document.getElementById('imagePreview');
       const brushSize = document.getElementById('brushSize').value;
-      const id = generateID();
       const iframeCode = document.getElementById('iframeCode');
 
       if (imgUrl.trim() === '') {
@@ -90,7 +89,7 @@
       preview.onload = () => {
         const width = preview.naturalWidth;
         const height = preview.naturalHeight;
-        const src = `https://nikashum93.github.io/eraser/main.html?img=${encodeURIComponent(imgUrl)}&size=${brushSize}&id=${id}`;
+        const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}&ui=1`;
         const code = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
         iframeCode.value = code;
       }
