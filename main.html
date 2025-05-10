@@ -1,144 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Magic Eraser</title>
+  <title>Редактор Волшебного Ластика</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: transparent;
+    body {
+      background: black;
+      color: #0ff;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
     }
-    canvas {
+    h1 {
+      font-size: 28px;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+    }
+    .logo {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #f0f;
+    }
+    label {
       display: block;
-      width: 100% !important;
-      height: 100% !important;
+      margin-top: 20px;
+      margin-bottom: 5px;
     }
-    @keyframes sparkle {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.4); opacity: 0; }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      background: #111;
+      color: #0ff;
+      border: 1px solid #0ff;
+      font-size: 14px;
+    }
+    img.preview {
+      margin-top: 20px;
+      max-width: 100%;
+      border: 2px solid #0ff;
+    }
+    .iframe-output {
+      margin-top: 30px;
+      background: #111;
+      padding: 10px;
+      border: 1px dashed #0ff;
+      color: #0f0;
     }
   </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <audio src="erase-sound.mp3" preload="auto" loop></audio>
+  <div class="logo">Корпорация Геймификации Будущего</div>
+  <h1>Редактор "Волшебного Ластика"</h1>
+
+  <label for="sourceType">Источник маски:</label>
+  <select id="sourceType" onchange="updatePreview()">
+    <option value="image" selected>Изображение</option>
+    <option value="color">Цвет маски</option>
+  </select>
+
+  <div id="imageBlock">
+    <label for="imgUrl">Ссылка на изображение (cover):</label>
+    <input type="text" id="imgUrl" placeholder="https://..." oninput="updatePreview()">
+  </div>
+
+  <div id="colorBlock" style="display: none;">
+    <label for="maskColor">Выбери цвет маски:</label>
+    <select id="maskColor" onchange="updatePreview()">
+      <option value="#000000">Чёрный</option>
+      <option value="#ffffff">Белый</option>
+      <option value="#ff0000">Красный</option>
+      <option value="#0000ff">Синий</option>
+      <option value="#00ff00">Зелёный</option>
+    </select>
+  </div>
+
+  <label for="brushSize">Размер кисти:</label>
+  <select id="brushSize">
+    <option value="20">Маленькая</option>
+    <option value="40" selected>Средняя</option>
+    <option value="80">Большая</option>
+  </select>
+
+  <div id="imagePreviewContainer">
+    <img id="imagePreview" class="preview" src="" alt="Превью изображения">
+  </div>
+
+  <label for="iframeCode">Готовый iframe-код:</label>
+  <textarea id="iframeCode" rows="5" readonly></textarea>
 
   <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const sound = document.querySelector("audio");
-    const params = new URLSearchParams(window.location.search);
+    function updatePreview() {
+      const sourceType = document.getElementById('sourceType').value;
+      const imgUrl = document.getElementById('imgUrl').value;
+      const maskColor = document.getElementById('maskColor').value;
+      const brushSize = document.getElementById('brushSize').value;
+      const preview = document.getElementById('imagePreview');
+      const iframeCode = document.getElementById('iframeCode');
 
-    const coverURL = params.get("cover");
-    const maskColor = params.get("mask") || "#000";
-    let brushSize = parseInt(params.get("brush")) || 40;
-
-    let imageLoaded = false;
-    const image = new Image();
-
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-    }
-
-    function sparkle(x, y) {
-      for (let i = 0; i < 6; i++) {
-        const s = document.createElement("div");
-        s.className = "sparkle";
-        const color = ["#fff", "#ccf6ff", "#ffddee", "#ffccff"][Math.floor(Math.random() * 4)];
-        s.style.background = color;
-        s.style.left = (x + (Math.random() * 10 - 5)) + "px";
-        s.style.top = (y + (Math.random() * 10 - 5)) + "px";
-        s.style.position = "absolute";
-        s.style.width = "4px";
-        s.style.height = "4px";
-        s.style.borderRadius = "50%";
-        s.style.pointerEvents = "none";
-        s.style.zIndex = "9999";
-        s.style.animation = "sparkle 0.6s forwards";
-        document.body.appendChild(s);
-        setTimeout(() => s.remove(), 600);
-      }
-    }
-
-    function enableEraser() {
-      let isErasing = false;
-
-      canvas.addEventListener("mousedown", () => {
-        isErasing = true;
-        sound.currentTime = 0;
-        sound.play();
-      });
-
-      canvas.addEventListener("mouseup", () => {
-        isErasing = false;
-        sound.pause();
-      });
-
-      canvas.addEventListener("mouseleave", () => {
-        isErasing = false;
-        sound.pause();
-      });
-
-      canvas.addEventListener("mousemove", (e) => {
-        if (!isErasing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.beginPath();
-        ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalCompositeOperation = "source-over";
-        sparkle(x, y);
-      });
-    }
-
-    window.addEventListener('load', () => {
-      resizeCanvas();
-
-      if (!coverURL) {
-        ctx.fillStyle = maskColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        enableEraser();
-        return;
-      }
-
-      image.crossOrigin = "anonymous";
-      image.onload = () => {
-        resizeCanvas();
-        imageLoaded = true;
-
-        const canvasRatio = canvas.width / canvas.height;
-        const imageRatio = image.width / image.height;
-        let drawWidth, drawHeight;
-
-        if (canvasRatio > imageRatio) {
-          drawHeight = canvas.height;
-          drawWidth = image.width * (canvas.height / image.height);
-        } else {
-          drawWidth = canvas.width;
-          drawHeight = image.height * (canvas.width / image.width);
+      if (sourceType === 'image') {
+        document.getElementById('imageBlock').style.display = 'block';
+        document.getElementById('colorBlock').style.display = 'none';
+        if (imgUrl.trim() === '') {
+          preview.src = '';
+          iframeCode.value = '';
+          return;
         }
-
-        const offsetX = (canvas.width - drawWidth) / 2;
-        const offsetY = (canvas.height - drawHeight) / 2;
-
-        ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-        enableEraser();
-      };
-
-      image.onerror = () => {
-        ctx.fillStyle = maskColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        enableEraser();
-      };
-
-      image.src = coverURL;
-    });
+        preview.src = imgUrl;
+        preview.onload = () => {
+          const width = preview.naturalWidth;
+          const height = preview.naturalHeight;
+          const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}`;
+          iframeCode.value = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
+        }
+      } else {
+        document.getElementById('imageBlock').style.display = 'none';
+        document.getElementById('colorBlock').style.display = 'block';
+        preview.src = '';
+        const width = 800;
+        const height = 600;
+        const src = `https://nikashum93.github.io/eraser/main.html?mask=${encodeURIComponent(maskColor)}&brush=${brushSize}`;
+        iframeCode.value = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
+      }
+    }
   </script>
 </body>
 </html>
