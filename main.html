@@ -35,10 +35,24 @@
     const maskColor = params.get("mask") || "#000";
     let brushSize = parseInt(params.get("brush")) || 40;
 
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    let imageReady = false;
+
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
+    }
+
+    function render() {
+      resizeCanvas();
+      if (coverURL && imageReady) {
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = maskColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
     }
 
     function sparkle(x, y) {
@@ -95,31 +109,28 @@
     }
 
     window.addEventListener('load', () => {
-      resizeCanvas();
-
       if (!coverURL) {
-        ctx.fillStyle = maskColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        render();
         enableEraser();
         return;
       }
 
-      const image = new Image();
-      image.crossOrigin = "anonymous";
-
       image.onload = () => {
-        resizeCanvas();
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height); // РАСТЯГИВАЕМ
+        imageReady = true;
+        render();
         enableEraser();
       };
 
       image.onerror = () => {
-        ctx.fillStyle = maskColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        render();
         enableEraser();
       };
 
       image.src = coverURL;
+    });
+
+    window.addEventListener('resize', () => {
+      render();
     });
   </script>
 </body>
