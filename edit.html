@@ -107,7 +107,7 @@
         preview.src = imgUrl;
         preview.onload = () => {
           const width = preview.naturalWidth;
-          const height = preview.naturalHeight;
+const height = preview.naturalHeight;
           const src = `https://nikashum93.github.io/eraser/main.html?cover=${encodeURIComponent(imgUrl)}&brush=${brushSize}`;
           iframeCode.value = `<iframe src="${src}" width="${width}" height="${height}" allow="pointer-lock" frameborder="0"></iframe>`;
         }
